@@ -1,16 +1,52 @@
 import * as core from '@actions/core'
-import {wait} from './wait'
+import Parser from 'rss-parser'
+import dayjs from 'dayjs'
+import axios from 'axios'
+
+dayjs().format()
+const parser = new Parser()
 
 async function run(): Promise<void> {
   try {
-    const ms: string = core.getInput('milliseconds')
-    core.debug(`Waiting ${ms} milliseconds ...`) // debug is only output if you set the secret `ACTIONS_STEP_DEBUG` to true
+    const showwcaseApiKey = core.getInput('SHOWWCASE_API_KEY')
 
-    core.debug(new Date().toTimeString())
-    await wait(parseInt(ms, 10))
-    core.debug(new Date().toTimeString())
+    // Parse the the hacker news RSS feed
+    const feedUrl = `https://feeds.feedburner.com/TheHackersNews`
+    const feed = await parser.parseURL(feedUrl)
 
-    core.setOutput('time', new Date().toTimeString())
+    const currentFeed = feed.items.filter((item: any) => {
+      return (
+        dayjs(item.isoDate).format('YYYY-MM-DD') ===
+        dayjs().format('YYYY-MM-DD')
+      )
+    })
+
+    if (!currentFeed) {
+      core.info('No feeds for the day')
+      return
+    }
+
+    const showwcasePostUrl = `https://cache.showwcase.com/threads`
+
+    for (let i = 0; i < currentFeed.length; i++) {
+      const content = currentFeed[i]?.content + '\n' + currentFeed[i]?.link
+
+      await axios.post(
+        showwcasePostUrl,
+        {
+          message: content
+        },
+        {
+          headers: {
+            'Content-Type': 'application/json',
+            Accept: 'application/json',
+            'X-API-KEY': showwcaseApiKey
+          }
+        }
+      )
+
+      // console.log(response.status)
+    }
   } catch (error) {
     if (error instanceof Error) core.setFailed(error.message)
   }
