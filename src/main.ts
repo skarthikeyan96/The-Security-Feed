@@ -31,7 +31,7 @@ async function run(): Promise<void> {
     for (let i = 0; i < currentFeed.length; i++) {
       const content = currentFeed[i]?.content + '\n' + currentFeed[i]?.link
 
-      await axios.post(
+      const response = await axios.post(
         showwcasePostUrl,
         {
           message: content
@@ -45,7 +45,7 @@ async function run(): Promise<void> {
         }
       )
 
-      // console.log(response.status)
+      core.info(response.status.toString())
     }
   } catch (error) {
     if (error instanceof Error) core.setFailed(error.message)

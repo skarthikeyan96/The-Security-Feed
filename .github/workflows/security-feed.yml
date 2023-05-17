@@ -18,7 +18,7 @@ jobs:
     - name: Install node dependencies
       run: npm install
 
-    - name: Run QOTD action
+    - name: Run Security Feed Action
       uses: ./ # Uses an action in the root directory
       with:
         SHOWWCASE_API_KEY: ${{ secrets.SHOWWCASE_API_KEY }}

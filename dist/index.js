@@ -67,7 +67,7 @@ function run() {
             const showwcasePostUrl = `https://cache.showwcase.com/threads`;
             for (let i = 0; i < currentFeed.length; i++) {
                 const content = ((_a = currentFeed[i]) === null || _a === void 0 ? void 0 : _a.content) + '\n' + ((_b = currentFeed[i]) === null || _b === void 0 ? void 0 : _b.link);
-                yield axios_1.default.post(showwcasePostUrl, {
+                const response = yield axios_1.default.post(showwcasePostUrl, {
                     message: content
                 }, {
                     headers: {
@@ -76,7 +76,7 @@ function run() {
                         'X-API-KEY': showwcaseApiKey
                     }
                 });
-                // console.log(response.status)
+                core.info(response.status.toString());
             }
         }
         catch (error) {
