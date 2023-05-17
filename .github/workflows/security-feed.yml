@@ -19,6 +19,6 @@ jobs:
       run: npm install
 
     - name: Run Security Feed Action
-      uses: ./ # Uses an action in the root directory
+      uses: ./lib # Uses an action in the root directory
       with:
         SHOWWCASE_API_KEY: ${{ secrets.SHOWWCASE_API_KEY }}
