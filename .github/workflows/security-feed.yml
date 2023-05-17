@@ -3,7 +3,7 @@ name: Post security news
 on:
   workflow_dispatch:
   schedule:
-  - cron: "0 0 * * *" # triggers every midnight
+  - cron: "0 23 * * *" # triggers everyday 23:00 
 
 jobs:
   build:

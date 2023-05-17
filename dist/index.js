@@ -48,36 +48,26 @@ const dayjs_1 = __importDefault(__nccwpck_require__(7401));
 const axios_1 = __importDefault(__nccwpck_require__(8757));
 (0, dayjs_1.default)().format();
 const parser = new rss_parser_1.default();
+const showwcasePostUrl = `https://cache.showwcase.com/threads`;
+const showwcaseApiKey = core.getInput('SHOWWCASE_API_KEY');
+const feedUrl = `https://feeds.feedburner.com/TheHackersNews`;
 function run() {
-    var _a, _b;
     return __awaiter(this, void 0, void 0, function* () {
         try {
-            const showwcaseApiKey = core.getInput('SHOWWCASE_API_KEY');
             // Parse the the hacker news RSS feed
-            const feedUrl = `https://feeds.feedburner.com/TheHackersNews`;
             const feed = yield parser.parseURL(feedUrl);
-            const currentFeed = feed.items.filter((item) => {
+            let currentFeed = feed.items.filter(item => {
                 return ((0, dayjs_1.default)(item.isoDate).format('YYYY-MM-DD') ===
                     (0, dayjs_1.default)().format('YYYY-MM-DD'));
             });
-            if (!currentFeed) {
-                core.info('No feeds for the day');
-                return;
-            }
-            const showwcasePostUrl = `https://cache.showwcase.com/threads`;
-            for (let i = 0; i < currentFeed.length; i++) {
-                const content = ((_a = currentFeed[i]) === null || _a === void 0 ? void 0 : _a.content) + '\n' + ((_b = currentFeed[i]) === null || _b === void 0 ? void 0 : _b.link);
-                const response = yield axios_1.default.post(showwcasePostUrl, {
-                    message: content
-                }, {
-                    headers: {
-                        'Content-Type': 'application/json',
-                        Accept: 'application/json',
-                        'X-API-KEY': showwcaseApiKey
-                    }
+            if (currentFeed.length === 0) {
+                core.info("No feeds for the day, ... fetching the previous day's feed");
+                currentFeed = feed.items.filter(item => {
+                    return ((0, dayjs_1.default)(item.isoDate).format('YYYY-MM-DD') ===
+                        (0, dayjs_1.default)().add(-1, 'day').format('YYYY-MM-DD'));
                 });
-                core.info(response.status.toString());
             }
+            postFeedToThread(currentFeed);
         }
         catch (error) {
             if (error instanceof Error)
@@ -85,6 +75,22 @@ function run() {
         }
     });
 }
+const postFeedToThread = (currentFeed) => __awaiter(void 0, void 0, void 0, function* () {
+    var _a, _b;
+    for (let i = 0; i < currentFeed.length; i++) {
+        const content = ((_a = currentFeed[i]) === null || _a === void 0 ? void 0 : _a.content) + '\n' + ((_b = currentFeed[i]) === null || _b === void 0 ? void 0 : _b.link);
+        const response = yield axios_1.default.post(showwcasePostUrl, {
+            message: content
+        }, {
+            headers: {
+                'Content-Type': 'application/json',
+                Accept: 'application/json',
+                'X-API-KEY': showwcaseApiKey
+            }
+        });
+        core.info(response.status.toString());
+    }
+});
 run();
 
 
