@@ -1,6 +1,6 @@
-name: 'Your name here'
-description: 'Provide a description here'
-author: 'Your name or organization here'
+name: 'The Security Feed'
+description: 'Bot that delivers the security news from rss feed of the hacker news to showwcase'
+author: 'Karthikeyan'
 inputs:
   SHOWWCASE_API_KEY:
     description: "Showwcase api key"
